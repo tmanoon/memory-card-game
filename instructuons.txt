@@ -1,0 +1,71 @@
+# Frontend Developer Home Task
+
+## Time Expectation
+- We respect your time! This task is designed to take 3-5 hours
+- Please don't spend more than one working day on this
+- It's okay if you don't implement all bonus features!!! - focus on quality over quantity
+
+## The Task: Memory Card Game with a Twist
+Create an interactive memory card game. This is your chance to show off your TypeScript skills and creativity!
+
+### Base Requirements
+1. Create a memory card game with:
+   - 4x4 grid of cards (8 matching pairs)
+   - Card flip animations on click
+   - Move counter
+   - Timer display
+   - Win condition check
+
+2. Implement at least 2 of these special features:
+   - **Power-Up System**: Random power-up cards that appear during gameplay
+     - "Peek": Reveals all cards for 1 second
+     - "Extra Time": Adds 30 seconds to the timer
+     - Power-ups should vanish if not used within 3 turns
+   
+   - **Multi-Select Mode**: 
+     - Add a toggle between normal and multi-select modes
+     - Allow selecting up to 3 cards at once
+     - Match any pairs within the selection
+   
+   - **Progressive Difficulty**:
+     - After winning, start a new round with added complexity
+     - Cards have both shapes AND colors
+     - Players must match both properties
+
+### Technical Requirements
+- Use TypeScript
+- Create your own state management (no Redux/Vuex/etc.)
+- Include loading states and error handling
+
+### Bonus Points (Optional)
+- Keyboard controls
+- Smooth animations for card flips
+- Local storage for high scores
+- Unit tests for game logic
+- Clear documentation
+- Clean commit history
+
+## What We're Looking For
+1. **Clean, maintainable code**
+   - Good component structure
+   - Clear TypeScript types
+   - Readable and well-documented code
+
+2. **Problem-solving ability**
+   - How you handle game logic
+   - How you manage application state
+   - How you deal with edge cases
+
+3. **Attention to detail**
+   - User experience
+   - Error handling
+   - Code organization
+
+## Submission Guidelines
+1. Create a new GitHub repository for your solution
+2. Include a README.md with:
+   - Setup instructions
+   - Brief explanation of your technical choices
+   - Any assumptions or trade-offs you made
+   - Which special features you implemented
+   - What you would improve with more time
