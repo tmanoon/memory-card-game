@@ -1,10 +1,5 @@
 # Frontend Developer Home Task
 
-## Time Expectation
-- We respect your time! This task is designed to take 3-5 hours
-- Please don't spend more than one working day on this
-- It's okay if you don't implement all bonus features!!! - focus on quality over quantity
-
 ## The Task: Memory Card Game with a Twist
 Create an interactive memory card game. This is your chance to show off your TypeScript skills and creativity!
 
