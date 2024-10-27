@@ -1,0 +1,14 @@
+html {
+    min-height: 100vh;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Roboto-Thin, Tahoma;
+}
+
+header h1 {
+    text-align: center;
+    margin-block: 4rem 1rem;
+}
