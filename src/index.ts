@@ -2,9 +2,11 @@ import { Card } from "./models/card.model"
 
 var gCards: Card[] = []
 var gFlippedCardsStack: string[] = []
-var movesCounter = 0
-var timer = 0
-var gIntervalId
+var gMatchedPairsFound: Card[] = []
+var movesCounter: number = 0
+var timer: number = 0
+var gIntervalId: ReturnType<typeof setInterval> = 0
+var gFoundPairs: number = 0
 
 function onInit() {
     const cardsEl = document.querySelector('.cards') as HTMLElement
@@ -27,7 +29,7 @@ function setTimer() {
     const timerEl = document.querySelector('.timer')!.querySelector('p') as HTMLParagraphElement
     gIntervalId = setInterval(() => {
         if (!timer) timer = 1
-        else timer++        
+        else timer++
         timerEl.innerText = timer.toString()
     }, 1000)
 }
@@ -43,48 +45,79 @@ function initCards() {
 function onFlip(num: number) {
     updateMoves()
     const selectedCardEl = document.getElementById(`card${num}`) as HTMLDivElement
-    const isOneFlipped: boolean = checkForFlippedCards()
-    const selectedCard: Card = gCards[num]
-    selectedCard.isHidden = false
     addToFlippedCardsStack(`card${num}`)
-    selectedCardEl.querySelector('p')!.innerText = selectedCard.icon
+    const isMatchFlipped: boolean = gFlippedCardsStack && gFlippedCardsStack.length === 2
+    const selectedCard: Card = gCards[num]
+    showCard(selectedCard, selectedCardEl)
     modifyCardClr(selectedCardEl, selectedCard)
-    if(isOneFlipped) {
-        setTimeout(() => {
-            hideAllCards()
-            flipBackAllCards()
-            cleanFlippedCardsStack()
-        }, 3000)
+    if (isMatchFlipped) {
+        let isPairMatching: boolean = checkForMatchingCards()
+        if (!isPairMatching) {
+            setTimeout(() => {
+                hideCards()
+                flipBackCards()
+                cleanFlippedCardsStack()
+            }, 1200)
+        }
     }
+    checkVictory()
+}
+
+function showCard(card: Card, cardEl: HTMLDivElement) {
+    card.isHidden = false
+    cardEl.querySelector('p')!.innerText = card.icon
+}
+
+function checkForMatchingCards() {
+    const firstCardNumId = +(gFlippedCardsStack[0].replace('card', ''))
+    const firstCard = gCards.find((card, idx) => idx === firstCardNumId) as Card
+    const secondCardNumId = +(gFlippedCardsStack[1].replace('card', ''))
+    const secondCard = gCards.find((card, idx) => idx === secondCardNumId) as Card
+    const condition = firstCard.shape === secondCard.shape && firstCard.color === secondCard.color
+    if (condition) {
+        if (!gMatchedPairsFound) gMatchedPairsFound = [firstCard, secondCard]
+        else gMatchedPairsFound = [...gMatchedPairsFound, firstCard, secondCard]
+        if (!gFoundPairs) gFoundPairs = 1
+        else gFoundPairs++
+        cleanFlippedCardsStack()
+    }
+    return condition
+}
+
+function checkVictory() {
+    const isVictory = gFoundPairs === 8
+    if (isVictory) setVictoryMode()
+}
+
+function setVictoryMode() {
+    clearInterval(gIntervalId)
+    const winEl = document.querySelector('.victory')!.querySelector('p') as HTMLParagraphElement
+    winEl.innerText = 1 + ''
 }
 
 function updateMoves() {
-    if(!movesCounter) movesCounter = 1 
+    if (!movesCounter) movesCounter = 1
     else movesCounter++
     const counterEl = document.querySelector('.moves')!.querySelector('p') as HTMLParagraphElement
     counterEl.innerText = movesCounter + ''
 }
 
-function checkForFlippedCards() {
-    return !!gCards.find(card => !card.isHidden)
-}
-
 function addToFlippedCardsStack(id: string) {
-    if(!gFlippedCardsStack || !gFlippedCardsStack.length) gFlippedCardsStack = []
-    gFlippedCardsStack.push(id)
+    if (!gFlippedCardsStack || !gFlippedCardsStack.length) gFlippedCardsStack = [id]
+    else gFlippedCardsStack.push(id)
 }
 
-function flipBackAllCards() {
+function flipBackCards() {
     const cardsEl = document.querySelector('.cards') as HTMLDivElement
-    for(let i = 0; i < gFlippedCardsStack.length; i++) {
+    for (let i = 0; i < gFlippedCardsStack.length; i++) {
         const flippedCardEl = cardsEl.querySelector(`#${gFlippedCardsStack[i]}`) as HTMLDivElement
         const idNum = +(gFlippedCardsStack[i].replace('card', ''))
         const flippedCard = gCards[idNum]
-        if(flippedCard.color !== 'black') {
+        if (flippedCard.color !== 'black') {
             flippedCardEl.classList.remove(flippedCard.color)
             flippedCardEl.classList.add('black')
-            flippedCardEl.querySelector('p')!.innerText = '?'
         }
+        flippedCardEl.querySelector('p')!.innerText = '?'
     }
 }
 
@@ -99,6 +132,8 @@ function modifyCardClr(cardEl: HTMLDivElement, selectedCard: Card) {
     }
 }
 
-function hideAllCards() {
-    gCards.forEach(card => card.isHidden = true)
+function hideCards() {
+    gCards.forEach(card => {
+        card.isHidden = true
+    })
 }

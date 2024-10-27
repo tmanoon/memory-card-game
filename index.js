@@ -2,9 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var gCards = [];
 var gFlippedCardsStack = [];
+var gMatchedPairsFound = [];
 var movesCounter = 0;
 var timer = 0;
-var gIntervalId;
+var gIntervalId = 0;
+var gFoundPairs = 0;
 function onInit() {
     const cardsEl = document.querySelector('.cards');
     let htmlStr = '';
@@ -41,19 +43,55 @@ function initCards() {
 function onFlip(num) {
     updateMoves();
     const selectedCardEl = document.getElementById(`card${num}`);
-    const isOneFlipped = checkForFlippedCards();
-    const selectedCard = gCards[num];
-    selectedCard.isHidden = false;
     addToFlippedCardsStack(`card${num}`);
-    selectedCardEl.querySelector('p').innerText = selectedCard.icon;
+    const isMatchFlipped = gFlippedCardsStack && gFlippedCardsStack.length === 2;
+    const selectedCard = gCards[num];
+    showCard(selectedCard, selectedCardEl);
     modifyCardClr(selectedCardEl, selectedCard);
-    if (isOneFlipped) {
-        setTimeout(() => {
-            hideAllCards();
-            flipBackAllCards();
-            cleanFlippedCardsStack();
-        }, 3000);
+    if (isMatchFlipped) {
+        let isPairMatching = checkForMatchingCards();
+        if (!isPairMatching) {
+            setTimeout(() => {
+                hideCards();
+                flipBackCards();
+                cleanFlippedCardsStack();
+            }, 1200);
+        }
     }
+    checkVictory();
+}
+function showCard(card, cardEl) {
+    card.isHidden = false;
+    cardEl.querySelector('p').innerText = card.icon;
+}
+function checkForMatchingCards() {
+    const firstCardNumId = +(gFlippedCardsStack[0].replace('card', ''));
+    const firstCard = gCards.find((card, idx) => idx === firstCardNumId);
+    const secondCardNumId = +(gFlippedCardsStack[1].replace('card', ''));
+    const secondCard = gCards.find((card, idx) => idx === secondCardNumId);
+    const condition = firstCard.shape === secondCard.shape && firstCard.color === secondCard.color;
+    if (condition) {
+        if (!gMatchedPairsFound)
+            gMatchedPairsFound = [firstCard, secondCard];
+        else
+            gMatchedPairsFound = [...gMatchedPairsFound, firstCard, secondCard];
+        if (!gFoundPairs)
+            gFoundPairs = 1;
+        else
+            gFoundPairs++;
+        cleanFlippedCardsStack();
+    }
+    return condition;
+}
+function checkVictory() {
+    const isVictory = gFoundPairs === 8;
+    if (isVictory)
+        setVictoryMode();
+}
+function setVictoryMode() {
+    clearInterval(gIntervalId);
+    const winEl = document.querySelector('.victory').querySelector('p');
+    winEl.innerText = 1 + '';
 }
 function updateMoves() {
     if (!movesCounter)
@@ -63,15 +101,13 @@ function updateMoves() {
     const counterEl = document.querySelector('.moves').querySelector('p');
     counterEl.innerText = movesCounter + '';
 }
-function checkForFlippedCards() {
-    return !!gCards.find(card => !card.isHidden);
-}
 function addToFlippedCardsStack(id) {
     if (!gFlippedCardsStack || !gFlippedCardsStack.length)
-        gFlippedCardsStack = [];
-    gFlippedCardsStack.push(id);
+        gFlippedCardsStack = [id];
+    else
+        gFlippedCardsStack.push(id);
 }
-function flipBackAllCards() {
+function flipBackCards() {
     const cardsEl = document.querySelector('.cards');
     for (let i = 0; i < gFlippedCardsStack.length; i++) {
         const flippedCardEl = cardsEl.querySelector(`#${gFlippedCardsStack[i]}`);
@@ -80,8 +116,8 @@ function flipBackAllCards() {
         if (flippedCard.color !== 'black') {
             flippedCardEl.classList.remove(flippedCard.color);
             flippedCardEl.classList.add('black');
-            flippedCardEl.querySelector('p').innerText = '?';
         }
+        flippedCardEl.querySelector('p').innerText = '?';
     }
 }
 function cleanFlippedCardsStack() {
@@ -93,6 +129,8 @@ function modifyCardClr(cardEl, selectedCard) {
         cardEl.classList.add(selectedCard.color);
     }
 }
-function hideAllCards() {
-    gCards.forEach(card => card.isHidden = true);
+function hideCards() {
+    gCards.forEach(card => {
+        card.isHidden = true;
+    });
 }
