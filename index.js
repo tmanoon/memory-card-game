@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var gCards = [];
 var gFlippedCardsStack = [];
 var movesCounter = 0;
+var timer = 0;
+var gIntervalId;
 function onInit() {
     const cardsEl = document.querySelector('.cards');
     let htmlStr = '';
@@ -17,6 +19,17 @@ function onInit() {
         htmlStr += cardEl;
     }
     cardsEl.innerHTML += htmlStr;
+    setTimer();
+}
+function setTimer() {
+    const timerEl = document.querySelector('.timer').querySelector('p');
+    gIntervalId = setInterval(() => {
+        if (!timer)
+            timer = 1;
+        else
+            timer++;
+        timerEl.innerText = timer.toString();
+    }, 1000);
 }
 function initCards() {
     gCards = [{ shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },

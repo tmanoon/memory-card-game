@@ -3,6 +3,8 @@ import { Card } from "./models/card.model"
 var gCards: Card[] = []
 var gFlippedCardsStack: string[] = []
 var movesCounter = 0
+var timer = 0
+var gIntervalId
 
 function onInit() {
     const cardsEl = document.querySelector('.cards') as HTMLElement
@@ -18,6 +20,16 @@ function onInit() {
         htmlStr += cardEl
     }
     cardsEl.innerHTML += htmlStr
+    setTimer()
+}
+
+function setTimer() {
+    const timerEl = document.querySelector('.timer')!.querySelector('p') as HTMLParagraphElement
+    gIntervalId = setInterval(() => {
+        if (!timer) timer = 1
+        else timer++        
+        timerEl.innerText = timer.toString()
+    }, 1000)
 }
 
 function initCards() {
