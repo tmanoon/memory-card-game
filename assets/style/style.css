@@ -8,9 +8,13 @@ body {
     font-family: Roboto-Thin, Tahoma;
 }
 
+.game {
+    gap: 2rem;
+}
+
 header h1 {
     text-align: center;
-    margin-block: 4rem 1rem;
+    margin-block: 4rem 2rem;
 }
 
 .game .cards {
