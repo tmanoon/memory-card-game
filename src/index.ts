@@ -2,6 +2,7 @@ import { Card } from "./models/card.model"
 
 var gCards: Card[] = []
 var gFlippedCardsStack: string[] = []
+var movesCounter = 0
 
 function onInit() {
     const cardsEl = document.querySelector('.cards') as HTMLElement
@@ -28,6 +29,7 @@ function initCards() {
 }
 
 function onFlip(num: number) {
+    updateMoves()
     const selectedCardEl = document.getElementById(`card${num}`) as HTMLDivElement
     const isOneFlipped: boolean = checkForFlippedCards()
     const selectedCard: Card = gCards[num]
@@ -42,6 +44,13 @@ function onFlip(num: number) {
             cleanFlippedCardsStack()
         }, 3000)
     }
+}
+
+function updateMoves() {
+    if(!movesCounter) movesCounter = 1 
+    else movesCounter++
+    const counterEl = document.querySelector('.moves')!.querySelector('p') as HTMLParagraphElement
+    counterEl.innerText = movesCounter + ''
 }
 
 function checkForFlippedCards() {

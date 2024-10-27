@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var gCards = [];
 var gFlippedCardsStack = [];
+var movesCounter = 0;
 function onInit() {
     const cardsEl = document.querySelector('.cards');
     let htmlStr = '';
@@ -25,6 +26,7 @@ function initCards() {
     gCards.forEach(card => card.isHidden = true);
 }
 function onFlip(num) {
+    updateMoves();
     const selectedCardEl = document.getElementById(`card${num}`);
     const isOneFlipped = checkForFlippedCards();
     const selectedCard = gCards[num];
@@ -39,6 +41,14 @@ function onFlip(num) {
             cleanFlippedCardsStack();
         }, 3000);
     }
+}
+function updateMoves() {
+    if (!movesCounter)
+        movesCounter = 1;
+    else
+        movesCounter++;
+    const counterEl = document.querySelector('.moves').querySelector('p');
+    counterEl.innerText = movesCounter + '';
 }
 function checkForFlippedCards() {
     return !!gCards.find(card => !card.isHidden);
