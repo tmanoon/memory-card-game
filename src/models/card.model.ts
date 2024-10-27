@@ -3,5 +3,6 @@ export interface Card {
     shape: string,
     icon: string,
     color: string,
-    isHidden: boolean
+    isHidden: boolean,
+    isMatched: boolean
 }
