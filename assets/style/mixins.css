@@ -1,0 +1,14 @@
+.btn {
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    padding: .5rem 1rem;
+    font-family: Roboto-Thin, Tahoma;
+    font-size: 1rem;
+}
+
+.btn:hover {
+    transform: scale(1.2);
+}
