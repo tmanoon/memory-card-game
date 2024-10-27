@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,10 +8,18 @@
     <link rel="icon" href="./assets/pics/card-game.png" />
     <title>Memory Cards</title>
 </head>
+
 <body>
     <header>
         <h1>Memory Card Game</h1>
     </header>
-    <section class="game"></section>
+    <section class="game flex column align-center">
+        <div class="user-actions">
+            <button class="start btn" onclick="onInit()">Start</button>
+        </div>
+        <div class="cards grid"></div>
+    </section>
 </body>
+<script src="index.js"></script>
+
 </html>
