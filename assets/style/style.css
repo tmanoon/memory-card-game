@@ -12,3 +12,34 @@ header h1 {
     text-align: center;
     margin-block: 4rem 1rem;
 }
+
+.game .cards {
+    grid-template-rows: repeat(4, minmax(100px, 1fr));
+    grid-template-columns: repeat(4, minmax(80px, 1fr));
+    gap: .5rem;
+}
+
+.cards .card.red {
+    color: red;
+    border: 1.5px red solid;
+}
+
+.cards .card p {
+    font-size: 30px;
+    font-weight: bolder;
+}
+
+.cards .card.blue {
+    color: blue;
+    border: 1.5px blue solid;
+}
+
+.cards .card.black {
+    color: black;
+    border: 1.5px black solid;
+}
+
+.cards .card.pink {
+    color: pink;
+    border: 1.5px pink solid;
+}
