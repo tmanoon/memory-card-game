@@ -2,13 +2,14 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var gCards = [];
 var gFlippedCardsStack = [];
-var gMatchedPairsFound = [];
 var movesCounter = 0;
 var timer = 0;
 var gIntervalId = 0;
 var gFoundPairs = 0;
+var gMultiSelectMode = false;
 function onInit() {
     const cardsEl = document.querySelector('.cards');
+    const specialModesEl = document.querySelector('.special-modes');
     let htmlStr = '';
     initCards();
     for (let i = 0; i < gCards.length; i++) {
@@ -22,6 +23,7 @@ function onInit() {
     }
     cardsEl.innerHTML += htmlStr;
     setTimer();
+    specialModesEl.style.display = 'flex';
 }
 function setTimer() {
     const timerEl = document.querySelector('.timer').querySelector('p');
@@ -33,55 +35,106 @@ function setTimer() {
         timerEl.innerText = timer.toString();
     }, 1000);
 }
+function onMultiSelectMode() {
+    if (!gMultiSelectMode)
+        gMultiSelectMode = true;
+    else
+        gMultiSelectMode = false;
+}
 function initCards() {
     gCards = [{ shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },
         { shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },
         { shape: 'hexagon', icon: '⎔', color: 'black' }, { shape: 'triangle', icon: '△', color: 'pink' }, { shape: 'square', icon: '☐', color: 'blue' }, { shape: 'x', icon: '✕', color: 'red' },
         { shape: 'hexagon', icon: '⎔', color: 'black' }, { shape: 'triangle', icon: '△', color: 'pink' }, { shape: 'square', icon: '☐', color: 'blue' }, { shape: 'x', icon: '✕', color: 'red' }];
-    gCards.forEach(card => card.isHidden = true);
+    gCards.forEach((card, idx) => {
+        card.isHidden = true;
+        card.id = idx;
+        card.isMatched = false;
+    });
 }
 function onFlip(num) {
     updateMoves();
+    gCards[num].isHidden = false;
+    console.log(num, gCards[num]);
     const selectedCardEl = document.getElementById(`card${num}`);
-    addToFlippedCardsStack(`card${num}`);
-    const isMatchFlipped = gFlippedCardsStack && gFlippedCardsStack.length === 2;
+    addToFlippedCardsStack(num);
+    const isTwoCardsFlipped = gFlippedCardsStack && (gMultiSelectMode && gFlippedCardsStack.length === 3 || gFlippedCardsStack.length === 2);
     const selectedCard = gCards[num];
     showCard(selectedCard, selectedCardEl);
     modifyCardClr(selectedCardEl, selectedCard);
-    if (isMatchFlipped) {
-        let isPairMatching = checkForMatchingCards();
-        if (!isPairMatching) {
-            setTimeout(() => {
-                hideCards();
-                flipBackCards();
-                cleanFlippedCardsStack();
-            }, 1200);
-        }
+    if (isTwoCardsFlipped) {
+        toggleClickingOtherCards('off');
+        checkForMatchingCards();
+        setTimeout(() => {
+            hideCards();
+            flipBackCards();
+            cleanFlippedCardsStack();
+            toggleClickingOtherCards('on');
+        }, 2000);
     }
     checkVictory();
+}
+function toggleClickingOtherCards(mode) {
+    if (mode === 'off') {
+        gCards.forEach(card => {
+            const currCardEl = document.getElementById(`card${card.id}`);
+            currCardEl.style.pointerEvents = 'none';
+        });
+    }
+    else {
+        gCards.forEach(card => {
+            const currCardEl = document.getElementById(`card${card.id}`);
+            currCardEl.style.pointerEvents = 'auto';
+        });
+    }
 }
 function showCard(card, cardEl) {
     card.isHidden = false;
     cardEl.querySelector('p').innerText = card.icon;
 }
 function checkForMatchingCards() {
-    const firstCardNumId = +(gFlippedCardsStack[0].replace('card', ''));
-    const firstCard = gCards.find((card, idx) => idx === firstCardNumId);
-    const secondCardNumId = +(gFlippedCardsStack[1].replace('card', ''));
-    const secondCard = gCards.find((card, idx) => idx === secondCardNumId);
-    const condition = firstCard.shape === secondCard.shape && firstCard.color === secondCard.color;
+    const selectedCards = gFlippedCardsStack.map(id => gCards[id]);
+    console.log(selectedCards);
+    const condition = checkSelectedCards(selectedCards);
     if (condition) {
-        if (!gMatchedPairsFound)
-            gMatchedPairsFound = [firstCard, secondCard];
-        else
-            gMatchedPairsFound = [...gMatchedPairsFound, firstCard, secondCard];
         if (!gFoundPairs)
             gFoundPairs = 1;
         else
             gFoundPairs++;
-        cleanFlippedCardsStack();
     }
     return condition;
+}
+function checkSelectedCards(selectedCards) {
+    const firstCard = selectedCards[0];
+    const secondCard = selectedCards[1];
+    if (selectedCards.length === 2) {
+        if (firstCard.shape === secondCard.shape && firstCard.color === secondCard.color) {
+            gCards[firstCard.id].isMatched = true;
+            gCards[secondCard.id].isMatched = true;
+            return true;
+        }
+        else
+            return false;
+    }
+    else {
+        const thirdCard = selectedCards[2];
+        if (firstCard.shape === secondCard.shape && firstCard.color === secondCard.color) {
+            gCards[firstCard.id].isMatched = true;
+            gCards[secondCard.id].isMatched = true;
+            return true;
+        }
+        if (firstCard.shape === thirdCard.shape && firstCard.color === thirdCard.color) {
+            gCards[firstCard.id].isMatched = true;
+            gCards[thirdCard.id].isMatched = true;
+            return true;
+        }
+        if (secondCard.shape === thirdCard.shape && secondCard.color === thirdCard.color) {
+            gCards[secondCard.id].isMatched = true;
+            gCards[thirdCard.id].isMatched = true;
+            return true;
+        }
+        return false;
+    }
 }
 function checkVictory() {
     const isVictory = gFoundPairs === 8;
@@ -110,9 +163,11 @@ function addToFlippedCardsStack(id) {
 function flipBackCards() {
     const cardsEl = document.querySelector('.cards');
     for (let i = 0; i < gFlippedCardsStack.length; i++) {
-        const flippedCardEl = cardsEl.querySelector(`#${gFlippedCardsStack[i]}`);
-        const idNum = +(gFlippedCardsStack[i].replace('card', ''));
+        const flippedCardEl = cardsEl.querySelector(`#card${gFlippedCardsStack[i]}`);
+        const idNum = gCards[gFlippedCardsStack[i]].id;
         const flippedCard = gCards[idNum];
+        if (flippedCard.isMatched)
+            continue;
         if (flippedCard.color !== 'black') {
             flippedCardEl.classList.remove(flippedCard.color);
             flippedCardEl.classList.add('black');
@@ -131,6 +186,7 @@ function modifyCardClr(cardEl, selectedCard) {
 }
 function hideCards() {
     gCards.forEach(card => {
-        card.isHidden = true;
+        if (!card.isMatched)
+            card.isHidden = true;
     });
 }
