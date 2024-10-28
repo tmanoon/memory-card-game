@@ -8,35 +8,52 @@ var gIntervalId: ReturnType<typeof setInterval> = 0
 var gFoundPairs: number = 0
 var gMultiSelectMode: boolean = false
 
-function onInit() {
+function onInit(mode: string = 'easy') {
     const cardsEl = document.querySelector('.cards') as HTMLElement
     const specialModesEl = document.querySelector('.special-modes') as HTMLDivElement
     let htmlStr = ''
     initCards()
-    for (let i = 0; i < gCards.length; i++) {
+    if (mode !== 'easy') shuffleCards()
+    gCards.forEach((card, idx) => {
         const cardEl = `<div
          class="card black flex center"
-         id="card${i}"
-         onclick="onFlip(${i})">
+         id="card${idx}"
+         onclick="onFlip(${idx})">
          <p>?</p>
          </div>`
         htmlStr += cardEl
-    }
+    })
     cardsEl.innerHTML += htmlStr
     setTimer()
     specialModesEl.style.display = 'flex'
 }
 
+function shuffleCards() {
+    for (let i = gCards.length - 1; i > 0; i--) {
+        const j: number = Math.floor(Math.random() * (i + 1))
+        const temp = gCards[i]
+        gCards[i] = gCards[j]
+        gCards[j] = temp
+    }
+}
+
 function setTimer() {
     const timerEl = document.querySelector('.timer')!.querySelector('p') as HTMLParagraphElement
+    if(!timer) timer = 420
     gIntervalId = setInterval(() => {
-        if (!timer) timer = 1
-        else timer++
-        timerEl.innerText = timer.toString()
+        const minutes = Math.floor(timer / 60);
+        const seconds = timer % 60;
+        timerEl.innerText = `${minutes.toString()}:${seconds.toString()}`
+        if (timer <= 0) {
+            clearInterval(gIntervalId)
+            timerEl.innerText = "00:00"
+            toggleClickingOtherCards('off')
+            checkVictory()
+        } else timer--
     }, 1000)
 }
 
-function onMultiSelectMode() { 
+function onMultiSelectMode() {
     const multiSelectEl = document.querySelector('.multi-select') as HTMLButtonElement
     if (!gMultiSelectMode) {
         gMultiSelectMode = true
@@ -66,7 +83,7 @@ function onFlip(num: number) {
     console.log(num, gCards[num])
     const selectedCardEl = document.getElementById(`card${num}`) as HTMLDivElement
     addToFlippedCardsStack(num)
-    const isTwoCardsFlipped: boolean = gFlippedCardsStack && (gMultiSelectMode && gFlippedCardsStack.length === 3 || gFlippedCardsStack.length === 2)
+    const isTwoCardsFlipped: boolean = gFlippedCardsStack && (gMultiSelectMode ? gFlippedCardsStack.length === 3 : gFlippedCardsStack.length === 2)
     const selectedCard: Card = gCards[num]
     showCard(selectedCard, selectedCardEl)
     modifyCardClr(selectedCardEl, selectedCard)
@@ -149,9 +166,10 @@ function checkVictory() {
 }
 
 function setVictoryMode() {
-    clearInterval(gIntervalId)
     const winEl = document.querySelector('.victory')!.querySelector('p') as HTMLParagraphElement
     winEl.innerText = 1 + ''
+    const newRoundBtnEl = document.querySelector('.new-round') as HTMLButtonElement
+    newRoundBtnEl.style.display = 'block'
 }
 
 function updateMoves() {
