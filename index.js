@@ -11,8 +11,14 @@ var rounds = 0;
 function onInit(mode = 'easy') {
     if (!rounds)
         rounds = 1;
+    else
+        rounds++;
+    if (gIntervalId)
+        clearInterval(gIntervalId);
     const cardsEl = document.querySelector('.cards');
     const specialModesEl = document.querySelector('.special-modes');
+    const MovesEl = document.querySelector('.moves').querySelector('p');
+    MovesEl.innerText = '0';
     initCards();
     setState(rounds);
     let htmlStr = '';
@@ -27,8 +33,8 @@ function onInit(mode = 'easy') {
          </div>`;
         htmlStr += cardEl;
     });
-    cardsEl.innerHTML += htmlStr;
-    setTimer();
+    cardsEl.innerHTML = htmlStr;
+    setTimer('on');
     specialModesEl.style.display = 'flex';
 }
 function initCards() {
@@ -46,7 +52,11 @@ function setState(roundNum) {
     const STATE_KEY = 'state_db';
     const isState = localStorage.getItem(STATE_KEY);
     if (isState) {
+        if (isState && isState[roundNum])
+            return;
         const state = JSON.parse(localStorage.getItem(STATE_KEY));
+        if (!state[roundNum - 1])
+            state[roundNum - 1] = [{ round: roundNum, score: gFoundPairs }];
         state[roundNum - 1].score = gFoundPairs;
         localStorage.setItem(STATE_KEY, JSON.stringify(state));
     }
@@ -63,7 +73,7 @@ function shuffleCards() {
         gCards[j] = temp;
     }
 }
-function setTimer() {
+function setTimer(mode = 'on') {
     const timerEl = document.querySelector('.timer').querySelector('p');
     if (!timer)
         timer = 420;
@@ -71,10 +81,11 @@ function setTimer() {
         const minutes = Math.floor(timer / 60);
         const seconds = timer % 60;
         timerEl.innerText = `${minutes.toString()}:${seconds.toString()}`;
-        if (timer <= 0) {
-            clearInterval(gIntervalId);
+        if (timer <= 0 || mode === 'off') {
             timerEl.innerText = "00:00";
-            toggleClickingOtherCards('off');
+            timer = 420;
+            if (timer <= 0)
+                toggleClickingOtherCards('off');
             checkVictory();
         }
         else
@@ -186,6 +197,8 @@ function setVictoryMode() {
     winEl.innerText = 1 + '';
     const newRoundBtnEl = document.querySelector('.new-round');
     newRoundBtnEl.style.display = 'block';
+    gFoundPairs = 0;
+    onInit('harder');
 }
 function updateMoves() {
     if (!movesCounter)
