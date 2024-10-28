@@ -7,12 +7,19 @@ var timer: number = 0
 var gIntervalId: ReturnType<typeof setInterval> = 0
 var gFoundPairs: number = 0
 var gMultiSelectMode: boolean = false
+var rounds: number = 0
 
 function onInit(mode: string = 'easy') {
+    if(!rounds) rounds = 1
+    else rounds++
+    if(gIntervalId) clearInterval(gIntervalId)
     const cardsEl = document.querySelector('.cards') as HTMLElement
-    const specialModesEl = document.querySelector('.special-modes') as HTMLDivElement
-    let htmlStr = ''
+    const specialModesEl = document.querySelector('.special-modes') as HTMLDivElement   
+    const MovesEl = document.querySelector('.moves')!.querySelector('p') as HTMLParagraphElement
+    MovesEl.innerText = '0'
     initCards()
+    setState(rounds)
+    let htmlStr = ''
     if (mode !== 'easy') shuffleCards()
     gCards.forEach((card, idx) => {
         const cardEl = `<div
@@ -23,8 +30,9 @@ function onInit(mode: string = 'easy') {
          </div>`
         htmlStr += cardEl
     })
-    cardsEl.innerHTML += htmlStr
-    setTimer()
+    cardsEl.innerHTML = htmlStr
+
+    setTimer('on')
     specialModesEl.style.display = 'flex'
 }
 
@@ -40,6 +48,21 @@ function initCards() {
     })
 }
 
+function setState(roundNum: number) {
+    const STATE_KEY = 'state_db'
+    const isState = localStorage.getItem(STATE_KEY)
+    if(isState) {
+        if(isState && isState[roundNum]) return
+        const state = JSON.parse(localStorage.getItem(STATE_KEY) as string)
+        if (!state[roundNum - 1]) state[roundNum - 1] = [{round: roundNum, score: gFoundPairs}]
+        state[roundNum - 1].score = gFoundPairs
+        localStorage.setItem(STATE_KEY, JSON.stringify(state))
+    } else {
+        const state = [{round: 1, score: gFoundPairs}]
+        localStorage.setItem(STATE_KEY, JSON.stringify(state))
+    }
+}
+
 function shuffleCards() {
     for (let i = gCards.length - 1; i > 0; i--) {
         const j: number = Math.floor(Math.random() * (i + 1))
@@ -49,17 +72,17 @@ function shuffleCards() {
     }
 }
 
-function setTimer() {
+function setTimer(mode: string = 'on') {
     const timerEl = document.querySelector('.timer')!.querySelector('p') as HTMLParagraphElement
     if(!timer) timer = 420
     gIntervalId = setInterval(() => {
         const minutes = Math.floor(timer / 60);
         const seconds = timer % 60;
         timerEl.innerText = `${minutes.toString()}:${seconds.toString()}`
-        if (timer <= 0) {
-            clearInterval(gIntervalId)
+        if (timer <= 0 || mode === 'off') {
             timerEl.innerText = "00:00"
-            toggleClickingOtherCards('off')
+            timer = 420            
+            if (timer <= 0) toggleClickingOtherCards('off')
             checkVictory()
         } else timer--
     }, 1000)
@@ -125,6 +148,7 @@ function checkForMatchingCards() {
     if (condition) {
         if (!gFoundPairs) gFoundPairs = 1
         else gFoundPairs++
+        setState(rounds)
     }
     return condition
 }
@@ -169,6 +193,8 @@ function setVictoryMode() {
     winEl.innerText = 1 + ''
     const newRoundBtnEl = document.querySelector('.new-round') as HTMLButtonElement
     newRoundBtnEl.style.display = 'block'
+    gFoundPairs = 0
+    onInit('harder')
 }
 
 function updateMoves() {

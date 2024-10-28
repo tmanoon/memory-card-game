@@ -7,11 +7,15 @@ var timer = 0;
 var gIntervalId = 0;
 var gFoundPairs = 0;
 var gMultiSelectMode = false;
+var rounds = 0;
 function onInit(mode = 'easy') {
+    if (!rounds)
+        rounds = 1;
     const cardsEl = document.querySelector('.cards');
     const specialModesEl = document.querySelector('.special-modes');
-    let htmlStr = '';
     initCards();
+    setState(rounds);
+    let htmlStr = '';
     if (mode !== 'easy')
         shuffleCards();
     gCards.forEach((card, idx) => {
@@ -37,6 +41,19 @@ function initCards() {
         card.id = idx;
         card.isMatched = false;
     });
+}
+function setState(roundNum) {
+    const STATE_KEY = 'state_db';
+    const isState = localStorage.getItem(STATE_KEY);
+    if (isState) {
+        const state = JSON.parse(localStorage.getItem(STATE_KEY));
+        state[roundNum - 1].score = gFoundPairs;
+        localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    }
+    else {
+        const state = [{ round: 1, score: gFoundPairs }];
+        localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    }
 }
 function shuffleCards() {
     for (let i = gCards.length - 1; i > 0; i--) {
@@ -123,6 +140,7 @@ function checkForMatchingCards() {
             gFoundPairs = 1;
         else
             gFoundPairs++;
+        setState(rounds);
     }
     return condition;
 }
