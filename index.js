@@ -36,10 +36,15 @@ function setTimer() {
     }, 1000);
 }
 function onMultiSelectMode() {
-    if (!gMultiSelectMode)
+    const multiSelectEl = document.querySelector('.multi-select');
+    if (!gMultiSelectMode) {
         gMultiSelectMode = true;
-    else
+        multiSelectEl.style.border = '2px solid red';
+    }
+    else {
         gMultiSelectMode = false;
+        multiSelectEl.style.border = 'none';
+    }
 }
 function initCards() {
     gCards = [{ shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },

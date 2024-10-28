@@ -36,9 +36,16 @@ function setTimer() {
     }, 1000)
 }
 
-function onMultiSelectMode() {
-    if (!gMultiSelectMode) gMultiSelectMode = true
-    else gMultiSelectMode = false
+function onMultiSelectMode() { 
+    const multiSelectEl = document.querySelector('.multi-select') as HTMLButtonElement
+    if (!gMultiSelectMode) {
+        gMultiSelectMode = true
+        multiSelectEl.style.border = '2px solid red'
+    }
+    else {
+        gMultiSelectMode = false
+        multiSelectEl.style.border = 'none'
+    }
 }
 
 function initCards() {
