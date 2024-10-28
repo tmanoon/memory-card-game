@@ -17,14 +17,24 @@ header h1 {
     margin-block: 4rem 2rem;
 }
 
+.user-stats {
+    gap: 3rem;
+}
+
 .game .cards {
     grid-template-rows: repeat(4, minmax(100px, 1fr));
     grid-template-columns: repeat(4, minmax(80px, 1fr));
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .cards .card {
     cursor: pointer;
+    transition: transform 0.3s;
+    border-radius: 10px;
+}
+
+.cards .card.flipped {
+    transform: scale(1.1);
 }
 
 .cards .card.red {
@@ -50,4 +60,16 @@ header h1 {
 .cards .card.pink {
     color: pink;
     border: 1.5px pink solid;
+}
+
+.user-stats .special-modes {
+    display: none;
+}
+
+.user-actions {
+    gap: 1.5rem;
+}
+
+.user-actions .new-round {
+    display: none;
 }
