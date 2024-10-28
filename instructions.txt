@@ -22,7 +22,7 @@ Create an interactive memory card game. This is your chance to show off your Typ
      - Allow selecting up to 3 cards at once
      - Match any pairs within the selection
    
-   - **Progressive Difficulty**:
+   - **Progressive Difficulty**: 
      - After winning, start a new round with added complexity
      - Cards have both shapes AND colors
      - Players must match both properties
@@ -34,11 +34,11 @@ Create an interactive memory card game. This is your chance to show off your Typ
 
 ### Bonus Points (Optional)
 - Keyboard controls
-- Smooth animations for card flips
+- Smooth animations for card flips 
 - Local storage for high scores
 - Unit tests for game logic
 - Clear documentation
-- Clean commit history
+- Clean commit history 
 
 ## What We're Looking For
 1. **Clean, maintainable code**
