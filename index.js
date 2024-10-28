@@ -27,6 +27,17 @@ function onInit(mode = 'easy') {
     setTimer();
     specialModesEl.style.display = 'flex';
 }
+function initCards() {
+    gCards = [{ shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },
+        { shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },
+        { shape: 'hexagon', icon: '⎔', color: 'black' }, { shape: 'triangle', icon: '△', color: 'pink' }, { shape: 'square', icon: '☐', color: 'blue' }, { shape: 'x', icon: '✕', color: 'red' },
+        { shape: 'hexagon', icon: '⎔', color: 'black' }, { shape: 'triangle', icon: '△', color: 'pink' }, { shape: 'square', icon: '☐', color: 'blue' }, { shape: 'x', icon: '✕', color: 'red' }];
+    gCards.forEach((card, idx) => {
+        card.isHidden = true;
+        card.id = idx;
+        card.isMatched = false;
+    });
+}
 function shuffleCards() {
     for (let i = gCards.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -64,22 +75,11 @@ function onMultiSelectMode() {
         multiSelectEl.style.border = 'none';
     }
 }
-function initCards() {
-    gCards = [{ shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },
-        { shape: 'hexagon', icon: '⎔', color: 'red' }, { shape: 'triangle', icon: '△', color: 'blue' }, { shape: 'square', icon: '☐', color: 'pink' }, { shape: 'x', icon: '✕', color: 'black' },
-        { shape: 'hexagon', icon: '⎔', color: 'black' }, { shape: 'triangle', icon: '△', color: 'pink' }, { shape: 'square', icon: '☐', color: 'blue' }, { shape: 'x', icon: '✕', color: 'red' },
-        { shape: 'hexagon', icon: '⎔', color: 'black' }, { shape: 'triangle', icon: '△', color: 'pink' }, { shape: 'square', icon: '☐', color: 'blue' }, { shape: 'x', icon: '✕', color: 'red' }];
-    gCards.forEach((card, idx) => {
-        card.isHidden = true;
-        card.id = idx;
-        card.isMatched = false;
-    });
-}
 function onFlip(num) {
     updateMoves();
     gCards[num].isHidden = false;
-    console.log(num, gCards[num]);
     const selectedCardEl = document.getElementById(`card${num}`);
+    selectedCardEl.classList.add('flipped');
     addToFlippedCardsStack(num);
     const isTwoCardsFlipped = gFlippedCardsStack && (gMultiSelectMode ? gFlippedCardsStack.length === 3 : gFlippedCardsStack.length === 2);
     const selectedCard = gCards[num];
@@ -117,7 +117,6 @@ function showCard(card, cardEl) {
 }
 function checkForMatchingCards() {
     const selectedCards = gFlippedCardsStack.map(id => gCards[id]);
-    console.log(selectedCards);
     const condition = checkSelectedCards(selectedCards);
     if (condition) {
         if (!gFoundPairs)
@@ -188,6 +187,7 @@ function flipBackCards() {
     const cardsEl = document.querySelector('.cards');
     for (let i = 0; i < gFlippedCardsStack.length; i++) {
         const flippedCardEl = cardsEl.querySelector(`#card${gFlippedCardsStack[i]}`);
+        flippedCardEl.classList.remove('flipped');
         const idNum = gCards[gFlippedCardsStack[i]].id;
         const flippedCard = gCards[idNum];
         if (flippedCard.isMatched)
